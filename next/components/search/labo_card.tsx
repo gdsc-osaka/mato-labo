@@ -24,9 +24,9 @@ export const LaboCard = ({labo}: { labo: Laboratory }) => {
                     </button>
                 </div>
             </div>
-            <p className={'text-base py-2'}>{labo.seminarName}</p>
-            <p className={'text-sm'}>{labo.university.name + labo.course}</p>
-            <p className={'text-sm'}>{labo.major}</p>
+            <p className={'text-outline text-base py-2'}>{labo.seminarName}</p>
+            <p className={'text-outline text-sm'}>{labo.university.name + labo.course}</p>
+            <p className={'text-outline text-sm'}>{labo.major}</p>
             <div className={'relative z-10'}>
                 <a href={labo.websiteUrl} target={"_blank"} rel={"noopener noreferrer"}
                    className={'text-sm pt-2 break-all link'}>
