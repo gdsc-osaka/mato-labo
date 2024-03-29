@@ -53,8 +53,8 @@ const config = {
           foreground: "hsl(var(--card-foreground))",
         },
         outline: {
-          DEFAULT: "#74777F",
-          variant: "#C4C6D0"
+          DEFAULT: "var(--outline)",
+          variant: "var(--outline-variant)"
         },
         link: "var(--link)"
       },

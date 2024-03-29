@@ -34,6 +34,9 @@
 
     --radius: 0.5rem;
     --link: #1a0dab;
+
+    --outline: #74777F;
+    --outline-variant: #C4C6D0;
   }
 
   .dark {
