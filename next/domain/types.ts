@@ -11,3 +11,5 @@ export type Laboratory = Prisma.LaboratoryGetPayload<{
 }>
 
 export type RawLaboratory = Prisma.LaboratoryGetPayload<{}>;
+
+export type Discipline = Prisma.AcademicDisciplineGetPayload<{}>;

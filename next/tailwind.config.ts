@@ -55,7 +55,8 @@ const config = {
         outline: {
           DEFAULT: "#74777F",
           variant: "#C4C6D0"
-        }
+        },
+        link: "var(--link)"
       },
       borderRadius: {
         lg: "var(--radius)",

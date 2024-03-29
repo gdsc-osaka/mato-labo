@@ -4,7 +4,6 @@ import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import SelectRegion from "@/components/search/select_region";
 import SelectPrefecture from "@/components/search/select_pref";
-import {Button} from "@/components/ui/button";
 import {SearchParams} from "@/app/search/page";
 import {FormEvent} from "react";
 import {useRouter} from "next/navigation";
