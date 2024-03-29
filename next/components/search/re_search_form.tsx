@@ -8,9 +8,12 @@ import {SearchParams} from "@/app/search/page";
 import {FormEvent} from "react";
 import {useRouter} from "next/navigation";
 import {removeEmptyFields} from "@/lib/object_utils";
+import {Discipline} from "@/domain/types";
+import SelectDiscipline from "@/components/search/select_discipline";
 
-export default function ReSearchForm({defaultValue}: {
-    defaultValue: SearchParams
+export default function ReSearchForm({defaultValue, disciplines}: {
+    defaultValue: SearchParams,
+    disciplines: Discipline[]
 }) {
     const router = useRouter();
 
@@ -32,8 +35,7 @@ export default function ReSearchForm({defaultValue}: {
         <form className={'bg-card flex flex-col gap-6'} onSubmit={handleSearch}>
             <Input placeholder={'フリーワード検索'} defaultValue={defaultValue.q} name={'keyword'}
                    label={<Label htmlFor={'free-word-search'}>フリーワード検索</Label>}/>
-            <Input placeholder={'学問分野で検索'} name={'discipline'}
-                   label={<Label htmlFor={'discipline-search'}>学問分野で検索</Label>}/>
+            <SelectDiscipline name={'discipline'} defaultValue={defaultValue.dis} disciplines={disciplines}/>
             <SelectRegion name={'region'} defaultValue={defaultValue.region}/>
             <SelectPrefecture name={'prefecture'} defaultValue={defaultValue.pref}/>
             <div className={'flex flex-row justify-end'}>

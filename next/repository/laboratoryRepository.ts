@@ -5,6 +5,7 @@ type Query = {
     keyword?: string;
     prefectureIds?: number[];
     disciplineIds?: number[];
+    tagId?: string;
 }
 
 interface ILaboratoryRepository {
@@ -26,11 +27,19 @@ export class LaboratoryRepository implements ILaboratoryRepository {
                     },
                     disciplineId: {
                         in: query.disciplineIds
+                    },
+                    tags: {
+                        some: {
+                            tag: {
+                                id: query.tagId
+                            }
+                        }
                     }
                 },
                 include: {
                     university: true,
-                    discipline: true
+                    discipline: true,
+                    tags: true,
                 },
             });
         } catch (e) {
@@ -47,7 +56,8 @@ export class LaboratoryRepository implements ILaboratoryRepository {
                 },
                 include: {
                     university: true,
-                    discipline: true
+                    discipline: true,
+                    tags: true,
                 },
             });
         } catch (e) {

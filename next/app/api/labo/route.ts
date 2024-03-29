@@ -8,9 +8,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const params = request.nextUrl.searchParams;
 
     const keyword = params.get("q") ?? undefined;
-    const discipline = params.get("dis") ?? undefined;
+    const disciplineId = Number(params.get("dis"));
     const prefecture = params.get("pref") ?? undefined;
     const region = params.get("region") ?? undefined;
+    const tag = params.get("tag") ?? undefined;
 
     const prefectureIds = new Array<number>();
     if (!isNaN(Number(prefecture))) prefectureIds.push(Number(prefecture));
@@ -19,7 +20,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     try {
         const results = await laboratoryRepository.findMany({
             keyword,
-            prefectureIds: prefectureIds.length === 0 ? undefined : prefectureIds
+            prefectureIds: prefectureIds.length === 0 ? undefined : prefectureIds,
+            disciplineIds: isNaN(disciplineId) ? undefined : [disciplineId],
+            tagId: tag
         });
 
         return NextResponse.json(results);
