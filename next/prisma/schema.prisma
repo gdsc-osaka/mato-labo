@@ -53,7 +53,7 @@ enum LaboType {
 }
 
 model Laboratory {
-  id           String             @id @default(uuid())
+  id           String             @id @default(cuid())
   university   University         @relation(fields: [univId], references: [id])
   univId       Int
   discipline   AcademicDiscipline @relation(fields: [disciplineId], references: [id]) //
@@ -71,10 +71,32 @@ model Laboratory {
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
   scholars     Scholar[]
+  tags         TagsOnLaboratories[]
 
   @@index([univId])
   @@index([disciplineId])
   @@index([prefectureId])
+}
+
+model Tag {
+  id           String            @id
+  name         String            @unique
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  laboratories TagsOnLaboratories[]
+}
+
+model TagsOnLaboratories {
+  laboratory Laboratory @relation(fields: [laboId], references: [id])
+  laboId     String
+  tag        Tag        @relation(fields: [tagId], references: [id])
+  tagId      String
+  assignedAt DateTime   @default(now())
+  assignedBy String
+
+  @@id([laboId, tagId])
+  @@index([laboId])
+  @@index([tagId])
 }
 
 model Scholar {
