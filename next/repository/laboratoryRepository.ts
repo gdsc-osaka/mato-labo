@@ -28,13 +28,13 @@ export class LaboratoryRepository implements ILaboratoryRepository {
                     disciplineId: {
                         in: query.disciplineIds
                     },
-                    tags: {
-                        some: {
-                            tag: {
-                                id: query.tagId
-                            }
-                        }
-                    }
+                    // tags: {
+                    //     some: {
+                    //         tag: {
+                    //             id: query.tagId
+                    //         }
+                    //     }
+                    // }
                 },
                 include: {
                     university: true,
