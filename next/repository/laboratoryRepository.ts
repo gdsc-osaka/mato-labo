@@ -9,6 +9,7 @@ type Query = {
 
 interface ILaboratoryRepository {
     findMany(query: Query): Promise<Laboratory[]>;
+    find(id: string): Promise<Laboratory | null>;
     create(laboratory: Omit<RawLaboratory, "id" | "createdAt" | "updatedAt">): Promise<RawLaboratory>;
 }
 
@@ -26,6 +27,23 @@ export class LaboratoryRepository implements ILaboratoryRepository {
                     disciplineId: {
                         in: query.disciplineIds
                     }
+                },
+                include: {
+                    university: true,
+                    discipline: true
+                },
+            });
+        } catch (e) {
+            console.error(e);
+            return Promise.reject(e);
+        }
+    }
+
+    async find(id: string): Promise<Laboratory | null> {
+        try {
+            return await prisma.laboratory.findUnique({
+                where: {
+                    id: id
                 },
                 include: {
                     university: true,

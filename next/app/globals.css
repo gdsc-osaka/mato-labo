@@ -76,3 +76,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+.link {
+  color: var(--link);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}

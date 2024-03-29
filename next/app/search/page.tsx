@@ -9,7 +9,7 @@ const laboratoriesDecoder = z.array(laboratoryDecoder);
 
 const searchLaboratories = async (searchParams: SearchParams): Promise<Laboratory[]> => {
     const params = new URLSearchParams(searchParams);
-    const res = await fetch(process.env.URL + `/api/labos?${params.toString()}`, {
+    const res = await fetch(process.env.URL + `/api/labo?${params.toString()}`, {
         method: 'GET',
         next: {revalidate: 10},
     });
