@@ -13,11 +13,15 @@ export async function GET(
         return new NextResponse("Laboratory ID is required", { status: 400 });
     }
 
-    const result = await laboratoryRepository.find(id);
+    try {
+        const result = await laboratoryRepository.find(id);
 
-    if (!result) {
-        return new NextResponse("Couldn't find the specified laboratory", { status: 404 })
+        if (!result) {
+            return new NextResponse("Couldn't find the specified laboratory", { status: 404 })
+        }
+
+        return NextResponse.json(result, {status: 200});
+    } catch (e) {
+        return new NextResponse("Internal server error happened.", {status: 500})
     }
-
-    return NextResponse.json(result, {status: 200});
 }

@@ -16,10 +16,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     if (!isNaN(Number(prefecture))) prefectureIds.push(Number(prefecture));
     if (!isNaN(Number(region))) prefectureIds.push(...prefUtils.getPrefsByRegion(Number(region)).map(p => p.id));
 
-    const results = await laboratoryRepository.findMany({
-        keyword,
-        prefectureIds: prefectureIds.length === 0 ? undefined : prefectureIds
-    });
+    try {
+        const results = await laboratoryRepository.findMany({
+            keyword,
+            prefectureIds: prefectureIds.length === 0 ? undefined : prefectureIds
+        });
 
-    return NextResponse.json(results);
+        return NextResponse.json(results);
+    } catch (e) {
+        return new NextResponse("Internal server error happened.", {status: 500});
+    }
 }
