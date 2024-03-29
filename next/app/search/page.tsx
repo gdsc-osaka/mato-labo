@@ -39,7 +39,7 @@ export default async function SearchPage({searchParams}: { searchParams: SearchP
                 <p>詳細検索</p>
                 <ReSearchForm defaultValue={searchParams}/>
             </aside>
-            <div className={'grid grid-cols-4 gap-2 w-full ' +
+            <div className={'grid grid-cols-4 gap-4 w-full ' +
                 css`
                   grid-template-rows: auto 1fr;
                 `}>

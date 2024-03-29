@@ -5,7 +5,7 @@ import {css} from "@kuma-ui/core";
 
 export const LaboCard = ({labo}: { labo: Laboratory }) => {
     return (
-        <article className={'relative border border-outline p-4'}>
+        <article className={'relative border border-outline p-4 paper'}>
             <Link href={`/labo/${labo.id}`}
                   className={css`
                     position: absolute;
