@@ -1,6 +1,6 @@
 import type {Metadata} from 'next'
 import {Noto_Sans_JP} from 'next/font/google'
-import './globals.css'
+import './globals.scss'
 import {KumaRegistry} from "@kuma-ui/next-plugin/registry";
 import Header from "@/components/header";
 
