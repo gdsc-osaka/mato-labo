@@ -43,6 +43,13 @@ const accessPrompt =
     "  ]" +
     "} ".replaceAll("  ", "");
 
+const abstractPrompt =
+    "Extract the text of the Abstract directly from this screenshot and output it in json format below." +
+    " " +
+    "{" +
+    "  \"abstract\": \"\"" +
+    "}";
+
 export type LaboWebsite = {
     member: MemberData,
     access: Access
@@ -107,7 +114,7 @@ export const scrapeResearchMap = async (name: string, affiliation: string): Prom
         for (const paperUrl of researchMapPaperURL) {
             await browser.goTo(new URL(paperUrl));
 
-            const linkJoho = await browser.selectText("dt", "リンク情報");
+            const linkJoho = await browser.selectTextWithTag("dt", "リンク情報");
             if (!linkJoho) break;
             const parent = await linkJoho.getProperty('parentNode');
             if (parent instanceof ElementHandle) {
@@ -116,6 +123,27 @@ export const scrapeResearchMap = async (name: string, affiliation: string): Prom
             }
         }
         return {id: scholarUrl.pathname.substring(1), paperUrls: paperUrls};
+    } catch (e) {
+        console.error(`[Crawler] ${e}`);
+        return Promise.reject(e);
+    } finally {
+        await browser.close();
+    }
+}
+
+export const scrapeAbstract = async (paperUrl: string) => {
+    const browser = new Browser();
+
+    try {
+        await browser.launch(new URL(paperUrl));
+        const page = await browser.currentPage();
+        if (!page) return Promise.reject("currentPage() is undefined.");
+
+        const screenshot = await browser.screenshot(true);
+        const res = await callAIWithImage(abstractPrompt, screenshot);
+        const json = JSON.parse(res.response.text());
+
+        return json.abstract;
     } catch (e) {
         console.error(`[Crawler] ${e}`);
         return Promise.reject(e);

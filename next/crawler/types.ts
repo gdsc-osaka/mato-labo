@@ -26,3 +26,8 @@ export const accessSchema = z.object({
 });
 
 export type Access = z.infer<typeof accessSchema>;
+
+export type PaperData = {
+    srcUrl: string,
+    abstract: string;
+}

@@ -23,7 +23,7 @@ export class Browser {
         if (this.page === undefined) return Promise.reject("Couldn't navigate because this.page is undefined.");
 
         try {
-             const link = await this.selectText("a", ...linkText);
+             const link = await this.selectTextWithTag("a", ...linkText);
 
             if (!link) return Promise.reject(`No link found. (${linkText.join(", ")})`);
 
@@ -43,9 +43,9 @@ export class Browser {
         return this.page.goBack();
     }
 
-    screenshot() {
+    screenshot(full?: boolean) {
         if (this.page === undefined) return Promise.reject("Couldn't take screenshot because this.page is undefined.");
-        return this.page.screenshot({ path: `./crawler/screenshot.png`, fullPage: false });
+        return this.page.screenshot({ path: `./crawler/screenshot.png`, fullPage: full ?? false });
     }
 
     close(): Promise<void> {
@@ -58,21 +58,17 @@ export class Browser {
         return new URL(this.page.url());
     }
 
-    selectText(tag: string, ...text: string[]) {
+    selectTextWithTag(tag: string, ...text: string[]) {
         const selector = `::-p-xpath(${text.map(t => `//${tag}[contains(text(), '${t}')]`).join(' | ')})`;
         return this.page?.$(selector)
+    }
+
+    currentPage() {
+        return this.page;
     }
 
     selectAll(selector: string) {
         if (!this.page) throw new Error("this.page is null");
         return this.page.$$(selector);
-    }
-
-    wait() {
-        return this.page?.waitForNavigation();
-    }
-
-    newPage() {
-        return this.browser?.newPage();
     }
 }
