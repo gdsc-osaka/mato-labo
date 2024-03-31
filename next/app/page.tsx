@@ -1,29 +1,37 @@
 import {SearchBox} from "@/components/search";
-import {scrapeLaboratoryWebsite, scrapeResearchMap, LaboWebsite, scrapeAbstract} from "@/crawler/scraper";
+import {
+    scrapeLaboratoryWebsite,
+    scrapeResearchMap,
+    LaboWebsite,
+    scrapeAbstract,
+    summarizeAbstract
+} from "@/crawler/scraper";
 import {PaperData} from "@/crawler/types";
 
 export default function Home() {
     async function testAction() {
         'use server';
 
-        // const laboWebsite = await scrapeLaboratoryWebsite(new URL("https://www-mura.ist.osaka-u.ac.jp/"));
-        // console.log("[Scrape] " + JSON.stringify(laboWebsite,null,'  '));
-        // const professor = laboWebsite?.member.staff.find(m => m.position === "教授");
-        // if (!professor) {
-        //     console.error("[Scrape] Couldn't find professor");
-        //     return;
-        // }
-        // const affiliationName = "大阪大学";
-        // const researchMap = await scrapeResearchMap(professor.name, affiliationName);
-        // console.log("[Scrape] " + JSON.stringify(researchMap,null,'  '));
+        const laboWebsite = await scrapeLaboratoryWebsite(new URL("https://www-mura.ist.osaka-u.ac.jp/"));
+        console.log("[Scrape] " + JSON.stringify(laboWebsite,null,'  '));
+        const professor = laboWebsite?.member.staff.find(m => m.position === "教授");
+        if (!professor) {
+            console.error("[Scrape] Couldn't find professor");
+            return;
+        }
+        const affiliationName = "大阪大学";
+        const researchMap = await scrapeResearchMap(professor.name, affiliationName);
+        console.log("[Scrape] " + JSON.stringify(researchMap,null,'  '));
 
-        const paperUrls = ["https://ieeexplore.ieee.org/document/10445111"];
         const papers = new Array<PaperData>();
 
-        for (const paperUrl of paperUrls) {
+        for (const paperUrl of researchMap.paperUrls) {
             const abstract = await scrapeAbstract(paperUrl);
             papers.push({srcUrl: paperUrl, abstract})
         }
+
+        const result = await summarizeAbstract(papers.map(p => p.abstract));
+        console.log(result);
 
     }
 

@@ -1,7 +1,8 @@
 import {GoogleGenerativeAI} from '@google/generative-ai';
 
 const genAI = new GoogleGenerativeAI(process.env.AI_API_KEY as string);
-const model = genAI.getGenerativeModel({ model: 'gemini-pro-vision' });
+const visionModel = genAI.getGenerativeModel({ model: 'gemini-pro-vision' });
+const textModel = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
 export const callAIWithImage = async (prompt: string, imageBuffer: Buffer) => {
     const image = {
@@ -11,7 +12,11 @@ export const callAIWithImage = async (prompt: string, imageBuffer: Buffer) => {
         },
     };
 
-    return await model.generateContent([prompt, image]);
+    return await visionModel.generateContent([prompt, image]);
+}
+
+export const callAI = async (prompt: string) => {
+    return await textModel.generateContent([prompt]);
 }
 
 export const extractJsonFromResult = (result: string) => {

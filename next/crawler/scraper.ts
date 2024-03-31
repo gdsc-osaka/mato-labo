@@ -1,7 +1,8 @@
 import {Browser} from "@/crawler/browser";
-import {callAIWithImage, extractJsonFromResult} from "@/crawler/gemini";
+import {callAI, callAIWithImage, extractJsonFromResult} from "@/crawler/gemini";
 import {Access, accessSchema, MemberData, membersDataSchema} from "@/crawler/types";
 import {ElementHandle, JSHandle} from "puppeteer";
+import {z} from "zod";
 
 const memberPrompt =
     "このウェブページのスクリーンショットから，メンバーの情報を次のようなjsonで出力してください．" +
@@ -43,12 +44,16 @@ const accessPrompt =
     "  ]" +
     "} ".replaceAll("  ", "");
 
-const abstractPrompt =
-    "Extract the text of the Abstract directly from this screenshot and output it in json format below." +
-    " " +
-    "{" +
-    "  \"abstract\": \"\"" +
-    "}";
+const abstractPrompt = "" +
+    "This is a list of abstracts of papers published by a laboratory. Using this list as a reference, please write a statement (300 words or less) that describes the research conducted by this laboratory. Then translate it into Japanese and output both English and Japanese version in json format below.\n" +
+    "\n" +
+    "json format:\n" +
+    "{\n" +
+    "  \"summary_en\": \"\",\n" +
+    "  \"summary_jp\": \"\"\n" +
+    "}\n" +
+    "\n" +
+    "abstract list:"
 
 export type LaboWebsite = {
     member: MemberData,
@@ -131,7 +136,7 @@ export const scrapeResearchMap = async (name: string, affiliation: string): Prom
     }
 }
 
-export const scrapeAbstract = async (paperUrl: string) => {
+export const scrapeAbstract = async (paperUrl: string): Promise<string> => {
     const browser = new Browser();
 
     try {
@@ -150,4 +155,18 @@ export const scrapeAbstract = async (paperUrl: string) => {
     } finally {
         await browser.close();
     }
+}
+
+type AbstractSummary = {
+    summary_en: string,
+    summary_jp: string
+}
+const abstractSummarySchema = z.custom<AbstractSummary>();
+
+export const summarizeAbstract = async (abstractText: string[]) => {
+    const prompt = abstractPrompt + abstractText.map(text => `* ${text}`).join("\n");
+    const res = await callAI(prompt);
+    console.log(`[AI] response: ${res.response.text()}`)
+    const json = JSON.parse(res.response.text());
+    return abstractSummarySchema.parse(json);
 }
