@@ -1,10 +1,12 @@
 import {SearchBox} from "@/components/search";
-import {takeLaboPageScreenshot} from "@/crawler/laboratoryCrawler";
+import {scrapeLaboratoryWebsite, ScrapeResult} from "@/crawler/scraper";
 
 export default function Home() {
     async function testAction() {
         'use server';
-        takeLaboPageScreenshot(new URL("https://sdl.ist.osaka-u.ac.jp/"))
+
+        const scraperResult = await scrapeLaboratoryWebsite(new URL("https://www-mura.ist.osaka-u.ac.jp/"));
+        console.log("[Scrape]" + JSON.stringify(scraperResult,null,'  '));
     }
 
     return (

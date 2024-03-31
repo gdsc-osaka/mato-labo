@@ -8,6 +8,7 @@ declare module 'process' {
                 GOOGLE_CLIENT_ID: string;
                 GOOGLE_CLIENT_SECRET: string;
                 URL: string; // ウェブサイトが動いてるURL (etc: http://localhost:3000/)
+                AI_API_KEY: string; // https://aistudio.google.com/app/apikey
             }
         }
     }

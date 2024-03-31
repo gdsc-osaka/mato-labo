@@ -1,0 +1,20 @@
+{
+  "staff": [
+    {
+      "name_ja": "田中太郎",
+      "name_en": "Taro Tanaka",
+      "position": "教授",
+      "position_en": "Professor",
+      "email": "taro@example.com"
+    }
+  ],
+  "student": [
+    {
+      "name_ja": "山田花子",
+      "name_en": "Hanako Yamada",
+      "position": "博士前期課程",
+      "position_en": "Master Course",
+      "email": "hanako@example.com"
+    }
+  ]
+}
