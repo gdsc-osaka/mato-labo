@@ -1,9 +1,10 @@
 import {describe, expect, test} from "vitest";
 import {extractJsonFromResult} from "@/crawler/gemini";
+import {membersDataSchema} from "@/crawler/types";
 
 describe("Gemini Test", () => {
     test("extractJsonFromResult() Test", () => {
-        const res = extractJsonFromResult("```json\n" +
+        const aiRes = "```json\n" +
             "{\n" +
             "  \"staff\": [\n" +
             "    {\n" +
@@ -51,7 +52,10 @@ describe("Gemini Test", () => {
             "  ],\n" +
             "  \"student\": []\n" +
             "}\n" +
-            "```\n");
+            "```\n";
+        const res = extractJsonFromResult(aiRes);
+        const membersData = membersDataSchema.parse(res);
+        console.log(membersData);
         expect(res).toHaveProperty("staff");
     })
 })

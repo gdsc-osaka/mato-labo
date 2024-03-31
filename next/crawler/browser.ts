@@ -23,8 +23,7 @@ export class Browser {
         if (this.page === undefined) return Promise.reject("Couldn't navigate because this.page is undefined.");
 
         try {
-            const selector = `::-p-xpath(${linkText.map(text => `//a[text()="${text}"]`).join(' | ')})`;
-            const link = await this.page.$(selector);
+             const link = await this.selectText("a", ...linkText);
 
             if (!link) return Promise.reject(`No link found. (${linkText.join(", ")})`);
 
@@ -33,6 +32,10 @@ export class Browser {
         } catch (e) {
             return Promise.reject(e);
         }
+    }
+
+    goTo(url: URL) {
+        return this.page?.goto(url.toString());
     }
 
     goBack() {
@@ -48,5 +51,28 @@ export class Browser {
     close(): Promise<void> {
         if (this.browser === undefined) return Promise.reject("this.browser is undefined.");
         return this.browser.close();
+    }
+
+    currentUrl(): URL {
+        if (!this.page) throw new Error("this.page is null");
+        return new URL(this.page.url());
+    }
+
+    selectText(tag: string, ...text: string[]) {
+        const selector = `::-p-xpath(${text.map(t => `//${tag}[contains(text(), '${t}')]`).join(' | ')})`;
+        return this.page?.$(selector)
+    }
+
+    selectAll(selector: string) {
+        if (!this.page) throw new Error("this.page is null");
+        return this.page.$$(selector);
+    }
+
+    wait() {
+        return this.page?.waitForNavigation();
+    }
+
+    newPage() {
+        return this.browser?.newPage();
     }
 }

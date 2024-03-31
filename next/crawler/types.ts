@@ -1,7 +1,7 @@
 import z from "zod";
 
 const memberSchema = z.object({
-    name_ja: z.string(),
+    name: z.string(),
     name_en: z.string().nullable(),
     position: z.string(),
     position_en: z.string().nullable(),
