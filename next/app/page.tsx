@@ -2,9 +2,8 @@ import {SearchBox} from "@/components/search";
 import {
     scrapeLaboratoryWebsite,
     scrapeResearchMap,
-    LaboWebsite,
     scrapeAbstract,
-    summarizeAbstract
+    summarizeAbstracts
 } from "@/crawler/scraper";
 import {PaperData} from "@/crawler/types";
 
@@ -30,7 +29,7 @@ export default function Home() {
             papers.push({srcUrl: paperUrl, abstract})
         }
 
-        const result = await summarizeAbstract(papers.map(p => p.abstract));
+        const result = await summarizeAbstracts(papers.map(p => p.abstract));
         console.log(result);
 
     }

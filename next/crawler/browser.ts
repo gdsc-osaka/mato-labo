@@ -19,6 +19,10 @@ export class Browser {
         }
     }
 
+    /**
+     * 入力されたテキストと一致するリンクを探し，そのページに飛びます
+     * @param linkText
+     */
     async navigate(...linkText: string[]) {
         if (this.page === undefined) return Promise.reject("Couldn't navigate because this.page is undefined.");
 

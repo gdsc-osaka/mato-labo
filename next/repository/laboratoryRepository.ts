@@ -8,7 +8,7 @@ type Query = {
     tagId?: string;
 }
 
-interface ILaboratoryRepository {
+export interface ILaboratoryRepository {
     findMany(query: Query): Promise<Laboratory[]>;
     find(id: string): Promise<Laboratory | null>;
     create(laboratory: Omit<RawLaboratory, "id" | "createdAt" | "updatedAt">): Promise<RawLaboratory>;

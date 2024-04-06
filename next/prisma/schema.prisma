@@ -53,10 +53,10 @@ enum LaboType {
 }
 
 model Laboratory {
-  id           String             @id @default(cuid())
-  university   University         @relation(fields: [univId], references: [id])
+  id           String               @id @default(cuid())
+  university   University           @relation(fields: [univId], references: [id])
   univId       Int
-  discipline   AcademicDiscipline @relation(fields: [disciplineId], references: [id]) //
+  discipline   AcademicDiscipline   @relation(fields: [disciplineId], references: [id]) //
   disciplineId Int
   name         String // ~~~~講座
   seminarName  String // ~~~~研究室
@@ -64,12 +64,16 @@ model Laboratory {
   major        String
   websiteUrl   String
   email        String
-  telNumber    String
+  telNumber    String // 電話番号
+  fax          String // FAX番号
+  postCode     String // 郵便番号
+  access       String[] // 研究室へのアクセス情報
+  address      String // 住所
   paperSummary String // 論文の要約
   prefectureId Int // 1~47の数字. 別途APIを作成して管理する
   laboType     LaboType
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
   scholars     Scholar[]
   tags         TagsOnLaboratories[]
 
@@ -79,10 +83,10 @@ model Laboratory {
 }
 
 model Tag {
-  id           String            @id
-  name         String            @unique
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
+  id           String               @id
+  name         String               @unique
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
   laboratories TagsOnLaboratories[]
 }
 
@@ -100,19 +104,26 @@ model TagsOnLaboratories {
 }
 
 model Scholar {
-  id              Int        @id @default(autoincrement())
+  id              String     @id @default(cuid())
   laboratory      Laboratory @relation(fields: [laboId], references: [id])
   laboId          String
-  name            String
-  role            String
-  email           String     @unique
-  telNumber       String
-  iconUri         String
-  googleScholarId String     @unique
+  name_ja         String
+  name_en         String?
+  position_ja     String
+  position_en     String?
+  email           String?    @unique
+  telNumber       String?
+  iconUri         String?
+  googleScholarId String?    @unique
+  researchMapId   String?    @unique
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
   @@index([laboId])
+}
+
+model Paper {
+  id Int @id @default(autoincrement())
 }
 
 // Auth
