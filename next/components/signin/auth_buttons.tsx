@@ -8,7 +8,7 @@ export const GoogleLoginButton = () => {
     return (
         <button className={'flex flex-row items-center gap-2 py-4 px-8 ' +
             'rounded border border-material-outline-variant transition-all hover:bg-slate-100'}
-                onClick={() => signIn('google', {}, { prompt: 'login' })}>
+        onClick={() => signIn('google', {}, { prompt: 'login' })}>
             <Image src={'/google_logo.webp'} alt={'google-icon'} width={20} height={20}/>
             Googleでログイン
         </button>

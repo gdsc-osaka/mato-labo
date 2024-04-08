@@ -10,17 +10,17 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({
-                                       children,
-                                   }: {
+    children,
+}: {
     children: React.ReactNode
 }) {
     return (
         <html lang="en">
-        <body className={inter.className + ' h-screen'}>
-        <KumaRegistry>
-            {children}
-        </KumaRegistry>
-        </body>
+            <body className={inter.className + ' h-screen'}>
+                <KumaRegistry>
+                    {children}
+                </KumaRegistry>
+            </body>
         </html>
     )
 }

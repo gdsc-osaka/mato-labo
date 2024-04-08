@@ -3,16 +3,16 @@ import Home from "@/app/page";
 import {render, screen} from "@testing-library/react";
 
 vitest.mock('next/navigation', () => ({
-  useRouter() {
-    return {
-      asPath: '/',
-    };
-  },
+    useRouter() {
+        return {
+            asPath: '/',
+        };
+    },
 }));
 
 test("Home Test", () => {
-  render(<Home/>);
-  expect(
-    screen.getByText("検索")
-  ).toBeDefined()
+    render(<Home/>);
+    expect(
+        screen.getByText("検索")
+    ).toBeDefined()
 });

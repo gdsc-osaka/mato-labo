@@ -17,7 +17,7 @@ export default async function Header() {
             </Link>
             {user && user.image &&
                 <img src={user.image} alt={'user-icon'} width={40} height={40}
-                     className={'rounded-full'}/>
+                    className={'rounded-full'}/>
             }
             {session === null &&
                 <Link href={'/signin'}>
