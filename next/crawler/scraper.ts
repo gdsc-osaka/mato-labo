@@ -49,7 +49,7 @@ const abstractPrompt = "" +
     "json format:\n" +
     "{\n" +
     "  \"summary_en\": \"\",\n" +
-    "  \"summary_jp\": \"\"\n" +
+    "  \"summary_ja\": \"\"\n" +
     "}\n" +
     "\n" +
     "abstract list:"
@@ -174,8 +174,8 @@ export const scrapeAbstract = async (paperUrl: string): Promise<string> => {
 }
 
 type AbstractSummary = {
-    summary_en: string,
-    summary_jp: string
+    paperSummary_en: string,
+    paperSummary_ja: string
 }
 const abstractSummarySchema = z.custom<AbstractSummary>();
 

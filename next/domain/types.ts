@@ -12,6 +12,9 @@ export type Laboratory = Prisma.LaboratoryGetPayload<{
 
 export type RawLaboratory = Prisma.LaboratoryGetPayload<{}>;
 export type RawLaboratoryForCreate = Omit<RawLaboratory, "id" | "createdAt" | "updatedAt">;
+export type RawLaboratoryForUpdate = Partial<Omit<RawLaboratory, "createdAt" | "updatedAt">> & {
+    id: string,
+};
 
 export type Discipline = Prisma.AcademicDisciplineGetPayload<{}>;
 
@@ -22,3 +25,6 @@ export type RawScholarForCreate = Omit<RawScholar, "id" | "createdAt" | "updated
 export type Scholar = Prisma.ScholarGetPayload<{
     include: {laboratory: true}
 }>;
+
+export type RawPaper = Prisma.PaperGetPayload<{}>;
+export type RawPaperForCreate = Omit<RawPaper, "id" | "scholarId">;
