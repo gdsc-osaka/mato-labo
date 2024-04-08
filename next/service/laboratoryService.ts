@@ -1,7 +1,13 @@
 import {ILaboratoryRepository} from "@/repository/laboratoryRepository";
 import {IScholarRepository} from "@/repository/scholarRepository";
-import {findResearchMapId, scrapeLaboratoryWebsite} from "@/crawler/scraper";
-import {RawScholarForCreate} from "@/domain/types";
+import {
+    findPaperUrls,
+    findResearchMapId,
+    scrapeAbstract,
+    scrapeLaboratoryWebsite,
+    summarizeAbstracts
+} from "@/crawler/scraper";
+import {Laboratory, RawScholarForCreate} from "@/domain/types";
 
 export interface ILaboratoryService {
     updateLaboratory(laboId: string): Promise<void>;
@@ -13,6 +19,7 @@ export class LaboratoryService implements ILaboratoryService {
         private scholarRepository: IScholarRepository
     ) {}
 
+    // TODO: Transactionで処理すべきか?
     async updateLaboratory(laboId: string): Promise<void> {
         try {
             const oldLaboData = await this.laboratoryRepository.find(laboId);
@@ -44,13 +51,29 @@ export class LaboratoryService implements ILaboratoryService {
                         researchMapId: researchMapId
                     });
                 }
-
-                await this.scholarRepository.createMany(scholars);
             }
 
-            // アクセスデータ
+            // 教授の論文のみ
+            const professor = scholars.find(s => s.position_en === 'professor')
 
+            if (professor && professor.researchMapId) {
+                const paperUrls = await findPaperUrls(professor.researchMapId);
+                const abstracts: string[] = []
 
+                for (const paperUrl of paperUrls) {
+                    const abstract = await scrapeAbstract(paperUrl);
+                    abstracts.push(abstract);
+                }
+
+                const summarize = await summarizeAbstracts(abstracts);
+
+                if (summarize) {
+                    newLaboData.paperSummary_ja = summarize.summary_jp;
+                    newLaboData.paperSummary_en = summarize.summary_en;
+                }
+            }
+
+            await this.scholarRepository.createMany(scholars);
         } catch (e) {
 
         }

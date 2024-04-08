@@ -53,29 +53,30 @@ enum LaboType {
 }
 
 model Laboratory {
-  id           String               @id @default(cuid())
-  university   University           @relation(fields: [univId], references: [id])
-  univId       Int
-  discipline   AcademicDiscipline   @relation(fields: [disciplineId], references: [id]) //
-  disciplineId Int
-  name         String // ~~~~講座
-  seminarName  String // ~~~~研究室
-  course       String
-  major        String
-  websiteUrl   String
-  email        String
-  telNumber    String // 電話番号
-  fax          String // FAX番号
-  postCode     String // 郵便番号
-  access       String[] // 研究室へのアクセス情報
-  address      String // 住所
-  paperSummary String // 論文の要約
-  prefectureId Int // 1~47の数字. 別途APIを作成して管理する
-  laboType     LaboType
-  createdAt    DateTime             @default(now())
-  updatedAt    DateTime             @updatedAt
-  scholars     Scholar[]
-  tags         TagsOnLaboratories[]
+  id              String               @id @default(cuid())
+  university      University           @relation(fields: [univId], references: [id])
+  univId          Int
+  discipline      AcademicDiscipline   @relation(fields: [disciplineId], references: [id]) //
+  disciplineId    Int
+  name            String // ~~~~講座
+  seminarName     String // ~~~~研究室
+  course          String
+  major           String
+  websiteUrl      String
+  email           String
+  telNumber       String // 電話番号
+  fax             String // FAX番号
+  postCode        String // 郵便番号
+  access          String[] // 研究室へのアクセス情報
+  address         String // 住所
+  paperSummary_ja String // 論文の要約
+  paperSummary_en String
+  prefectureId    Int // 1~47の数字. 別途APIを作成して管理する
+  laboType        LaboType
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  scholars        Scholar[]
+  tags            TagsOnLaboratories[]
 
   @@index([univId])
   @@index([disciplineId])
@@ -118,12 +119,16 @@ model Scholar {
   researchMapId   String?    @unique
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
+  papers          Paper[]
 
   @@index([laboId])
 }
 
 model Paper {
-  id Int @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
+  url       String
+  Scholar   Scholar? @relation(fields: [scholarId], references: [id])
+  scholarId String?
 }
 
 // Auth

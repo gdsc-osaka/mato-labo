@@ -120,21 +120,15 @@ export const findResearchMapId = async (name: string, affiliation: string): Prom
     }
 }
 
-export const scrapeResearchMap = async (name: string, affiliation: string): Promise<ResearchMap> => {
+export const findPaperUrls = async (researchMapId: string) => {
     const browser = new Browser();
-    const searchParams = new URLSearchParams({name, affiliation});
-    const url = `https://researchmap.jp/researchers?${searchParams.toString()}`
+    const url = `https://researchmap.jp/${researchMapId}/published_papers`
 
     try {
         await browser.launch(new URL(url));
-        await browser.navigate(name);
-        const scholarUrl = browser.currentUrl();
-        const publishedPapersURI = new URL(`${scholarUrl}/published_papers`)
-        await browser.goTo(publishedPapersURI);
-
         const paperElements = await browser.selectAll(".rm-cv-type-myself");
         const researchMapPaperURL = await Promise.all(
-            paperElements.map(el => el.$eval("a", (elm) => elm.href))
+          paperElements.map(el => el.$eval("a", (elm) => elm.href))
         );
         const paperUrls = new Array<string>();
 
@@ -149,7 +143,7 @@ export const scrapeResearchMap = async (name: string, affiliation: string): Prom
                 paperUrls.push(paperLink);
             }
         }
-        return {id: scholarUrl.pathname.substring(1), paperUrls: paperUrls};
+        return paperUrls;
     } catch (e) {
         console.error(`[Crawler] ${e}`);
         return Promise.reject(e);
@@ -186,9 +180,14 @@ type AbstractSummary = {
 const abstractSummarySchema = z.custom<AbstractSummary>();
 
 export const summarizeAbstracts = async (abstractText: string[]) => {
-    const prompt = abstractPrompt + abstractText.map(text => `* ${text}`).join("\n");
-    const res = await callAI(prompt);
-    console.log(`[AI] response: ${res.response.text()}`)
-    const json = JSON.parse(res.response.text());
-    return abstractSummarySchema.parse(json);
+    try {
+        const prompt = abstractPrompt + abstractText.map(text => `* ${text}`).join("\n");
+        const res = await callAI(prompt);
+        console.log(`[AI] response: ${res.response.text()}`)
+        const json = JSON.parse(res.response.text());
+        return abstractSummarySchema.parse(json);
+    } catch (e) {
+        console.error(e);
+        return undefined;
+    }
 }
