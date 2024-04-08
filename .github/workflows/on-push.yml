@@ -14,6 +14,16 @@ jobs:
       - uses: oven-sh/setup-bun@v1
       - name: bun install
         run: bun install
+      - name: Create .env file
+        shell: bash
+        run: |
+          touch .env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "DIRECT_URL=${{ secrets.DIRECT_URL }}" >> .env
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+          echo "URL=${{ secrets.URL }}" >> .env
+          echo "AI_API_KEY=${{ secrets.AI_API_KEY }}" >> .env
       - name: run unit test
         run: bun run test-unit
       - name: build test
