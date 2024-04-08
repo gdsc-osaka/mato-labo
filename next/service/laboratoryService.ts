@@ -1,12 +1,6 @@
 import {ILaboratoryRepository} from "@/repository/laboratoryRepository";
 import {IScholarRepository} from "@/repository/scholarRepository";
-import {
-    findPaperUrls,
-    findResearchMapId,
-    scrapeAbstract,
-    scrapeLaboratoryWebsite,
-    summarizeAbstracts
-} from "@/crawler/scraper";
+import {ILaboratoryScraper} from "@/crawler/scraper";
 import {RawPaperForCreate, RawScholarForCreate} from "@/domain/types";
 import {prisma} from "@/repository/prisma";
 import {ITransactionRepository} from "@/repository/transactionRepository";
@@ -20,6 +14,7 @@ export class LaboratoryService implements ILaboratoryService {
         private laboratoryRepository: ILaboratoryRepository,
         private scholarRepository: IScholarRepository,
         private transactionRepository: ITransactionRepository,
+        private laboratoryScraper: ILaboratoryScraper,
     ) {
     }
 
@@ -33,7 +28,7 @@ export class LaboratoryService implements ILaboratoryService {
             if (oldLaboData.websiteUrl === null) return Promise.reject(`Laboratory.websiteUrl is null. (${laboId})`)
 
             const url = new URL(oldLaboData.websiteUrl);
-            const laboWebsite = await scrapeLaboratoryWebsite(url);
+            const laboWebsite = await this.laboratoryScraper.scrapeLaboratoryWebsite(url);
             const memberData = laboWebsite.member;
             const scholars: RawScholarForCreate[] = [];
 
@@ -41,7 +36,7 @@ export class LaboratoryService implements ILaboratoryService {
             if (memberData !== undefined) {
                 // スタッフのみ登録
                 for (const staff of memberData.staff) {
-                    const researchMapId = await findResearchMapId(staff.name, oldLaboData.university.name);
+                    const researchMapId = await this.laboratoryScraper.findResearchMapId(staff.name, oldLaboData.university.name);
                     scholars.push({
                         laboId: laboId,
                         name_ja: staff.name,
@@ -68,16 +63,16 @@ export class LaboratoryService implements ILaboratoryService {
             const papersMap = new Map<string, RawPaperForCreate[]>();
 
             if (professor !== undefined && professor.researchMapId !== null) {
-                const paperUrls = await findPaperUrls(professor.researchMapId);
+                const paperUrls = await this.laboratoryScraper.findPaperUrls(professor.researchMapId);
                 papersMap.set(professor.researchMapId, paperUrls.map(url => ({url})));
 
                 const abstracts: string[] = []
                 for (const paperUrl of paperUrls) {
-                    const abstract = await scrapeAbstract(paperUrl);
-                    abstracts.push(abstract);
+                    const abstract = await this.laboratoryScraper.scrapeAbstract(paperUrl);
+                    if (abstract) abstracts.push(abstract);
                 }
 
-                const summary = await summarizeAbstracts(abstracts);
+                const summary = await this.laboratoryScraper.summarizeAbstracts(abstracts);
 
                 if (summary !== undefined) {
                     paperSummary = summary;
