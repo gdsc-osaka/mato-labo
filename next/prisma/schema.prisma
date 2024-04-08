@@ -12,30 +12,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model University {
-  id           Int             @id @default(autoincrement())
-  name         String
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  laboratories Laboratory[]
-  institution  InstitutionType
-}
-
 /// 国立、公立、私立など
 enum InstitutionType {
   NATIONAL
   PRIVATE
   PUBLIC
-}
-
-// 学問分野
-model AcademicDiscipline {
-  id           Int          @id @default(autoincrement())
-  name         String
-  type         ScienceType
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  laboratories Laboratory[]
 }
 
 enum ScienceType {
@@ -46,41 +27,93 @@ enum ScienceType {
   APPLIED // 応用科学
 }
 
+/// 学問分野. ~~学
+model AcademicDiscipline {
+  id           Int          @id @default(autoincrement())
+  name         String
+  type         ScienceType
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  laboratories Laboratory[]
+}
+
 enum LaboType {
   DEFAULT // 普通の講座
   COOPORATIVE // 協力講座
   AFFILIATED // 連携講座
 }
 
+model University {
+  id              Int              @id @default(autoincrement())
+  name            String
+  url             String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  institution     InstitutionType
+  laboratories    Laboratory[]
+  graduateSchools GraduateSchool[]
+}
+
+/// ~~~研究科
+model GraduateSchool {
+  id           String       @id @default(cuid())
+  url          String
+  university   University   @relation(fields: [universityId], references: [id])
+  universityId Int
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  majors       Major[]
+  laboratories Laboratory[]
+
+  @@index([universityId])
+}
+
+/// ~~~専攻. 専攻ごとにWebサイトがあるところもあるので正規化した
+model Major {
+  id               String         @id @default(cuid())
+  url              String
+  graduateSchool   GraduateSchool @relation(fields: [graduateSchoolId], references: [id])
+  graduateSchoolId String
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  laboratories     Laboratory[]
+
+  @@index([graduateSchoolId])
+}
+
 model Laboratory {
-  id              String               @id @default(cuid())
-  university      University           @relation(fields: [univId], references: [id])
-  univId          Int
-  discipline      AcademicDiscipline   @relation(fields: [disciplineId], references: [id]) //
-  disciplineId    Int
-  name            String // ~~~~講座
-  seminarName     String // ~~~~研究室
-  course          String
-  major           String
-  websiteUrl      String
-  email           String
-  telNumber       String // 電話番号
-  fax             String // FAX番号
-  postCode        String // 郵便番号
-  access          String[] // 研究室へのアクセス情報
-  address         String // 住所
-  paperSummary_ja String // 論文の要約
-  paperSummary_en String
-  prefectureId    Int // 1~47の数字. 別途APIを作成して管理する
-  laboType        LaboType
-  createdAt       DateTime             @default(now())
-  updatedAt       DateTime             @updatedAt
-  scholars        Scholar[]
-  tags            TagsOnLaboratories[]
+  id               String               @id @default(cuid())
+  university       University           @relation(fields: [univId], references: [id])
+  univId           Int
+  discipline       AcademicDiscipline   @relation(fields: [disciplineId], references: [id]) //
+  disciplineId     Int
+  graduateSchool   GraduateSchool       @relation(fields: [graduateSchoolId], references: [id])
+  graduateSchoolId String
+  major            Major                @relation(fields: [majorId], references: [id])
+  majorId          String
+  name             String // ~~~~講座
+  seminarName      String // ~~~~研究室
+  websiteUrl       String
+  email            String
+  telNumber        String // 電話番号
+  fax              String // FAX番号
+  postCode         String // 郵便番号
+  access           String[] // 研究室へのアクセス情報
+  address          String // 住所
+  paperSummary_ja  String // 論文の要約
+  paperSummary_en  String
+  prefectureId     Int // 1~47の数字. 別途APIを作成して管理する
+  laboType         LaboType
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  scholars         Scholar[]
+  tags             TagsOnLaboratories[]
 
   @@index([univId])
   @@index([disciplineId])
   @@index([prefectureId])
+  @@index([graduateSchoolId])
+  @@index([majorId])
 }
 
 model Tag {
@@ -125,9 +158,9 @@ model Scholar {
 }
 
 model Paper {
-  id        Int      @id @default(autoincrement())
-  url       String   @unique
-  Scholar   Scholar  @relation(fields: [scholarId], references: [id])
+  id        Int     @id @default(autoincrement())
+  url       String  @unique
+  Scholar   Scholar @relation(fields: [scholarId], references: [id])
   scholarId String
 }
 
