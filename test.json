@@ -1,8 +1,0 @@
-{
-  "embeds": {
-    "title": "Success to Build Test :white_check_mark:",
-    "description": "${{ github.event.head_commit.message }}\nbranch: `${{ github.ref_name }}`",
-    "url: "https://github.com/gdsc-osaka/labo-mato/actions/runs/7420976736\",
-"color": 5763719
-}
-}
