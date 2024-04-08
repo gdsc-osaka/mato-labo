@@ -82,7 +82,7 @@ export const scrapeLaboratoryWebsite = async (laboUrl: URL): Promise<LaboWebsite
 
 const navigateAndScrape = async <T extends ZodRawShape>(browser: Browser, prompt: string, schema: z.ZodObject<T>, ...linkTexts: string[]) => {
     try {
-        await browser.navigate(...linkTexts);
+        await browser.$texts(...linkTexts);
         console.debug(`[Crawler] navigate to ${linkTexts.join(",")} complete.`)
         const screenshot = await browser.screenshot();
         const res = await callAIWithImage(prompt, screenshot);
@@ -109,7 +109,7 @@ export const findResearchMapId = async (name: string, affiliation: string): Prom
 
     try {
         await browser.launch(new URL(url));
-        await browser.navigate(name);
+        await browser.$texts(name);
         const scholarUrl = browser.currentUrl();
         return scholarUrl.pathname.substring(1);
     } catch (e) {

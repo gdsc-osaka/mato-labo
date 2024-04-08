@@ -1,6 +1,14 @@
 import puppeteer, {Browser as PBrowser, Page} from "puppeteer";
 
-export class Browser {
+export interface IBrowser {
+    launch(url: URL): Promise<void>;
+    currentUrl(): URL;
+    $texts(...linkText: string[]): Promise<void>;
+    $class(className: string): Promise<void>;
+    scrollTo(text: string): Promise<void>;
+}
+
+export class Browser implements IBrowser {
     private browser: PBrowser | undefined;
     private page: Page | undefined;
 
@@ -13,7 +21,7 @@ export class Browser {
             });
             this.page = await browser.newPage();
             await this.page.setViewport({ width: 1920, height: 1080 });
-            return this.page.goto(url.toString(), {"waitUntil": "domcontentloaded"});
+            await this.page.goto(url.toString(), {"waitUntil": "domcontentloaded"});
         } catch (e) {
             return Promise.reject(e);
         }
@@ -23,7 +31,7 @@ export class Browser {
      * 入力されたテキストと一致するリンクを探し，そのページに飛びます
      * @param linkText
      */
-    async navigate(...linkText: string[]) {
+    async $texts(...linkText: string[]) {
         if (this.page === undefined) return Promise.reject("Couldn't navigate because this.page is undefined.");
 
         try {
@@ -32,7 +40,23 @@ export class Browser {
             if (!link) return Promise.reject(`No link found. (${linkText.join(", ")})`);
 
             await link.click();
-            return this.page.waitForNavigation();
+            await this.page.waitForNavigation();
+        } catch (e) {
+            return Promise.reject(e);
+        }
+    }
+
+    async $class(className: string) {
+        if (this.page === undefined) return Promise.reject("Couldn't navigate because this.page is undefined.");
+
+        const selector = `::-p-xpath(//*[@class='${className}'])`;
+        try {
+            const clazz = await this.page.$(selector);
+            if (clazz === null) return Promise.reject('No link found.');
+            const link = await clazz.$("//a")
+            if (link === null) return Promise.reject('No link found.');
+            await link.click();
+            await this.page.waitForNavigation();
         } catch (e) {
             return Promise.reject(e);
         }
@@ -74,5 +98,18 @@ export class Browser {
     selectAll(selector: string) {
         if (!this.page) throw new Error("this.page is null");
         return this.page.$$(selector);
+    }
+
+    async scrollTo(text: string): Promise<void> {
+        if (!this.page) return Promise.reject("this.page is null");
+        const selector = `::-p-xpath(//[contains(text(), ${text})])`;
+
+        try {
+            const el = await this.page.$(selector);
+            if (el === null) return Promise.reject("Element not found.");
+            await el.scrollIntoView();
+        } catch (e) {
+            return Promise.reject(e);
+        }
     }
 }
