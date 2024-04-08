@@ -1,0 +1,42 @@
+name: integration-test
+
+on:
+  schedule:
+    # everyday 00:00 JST
+    - cron: '0 15 * * *'
+
+jobs:
+  run-integration-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: next
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+      - name: bun install
+        run: bun install
+      - name: run integration test
+        run: bun run test-integration
+      - name: discord-notification-success
+        if: ${{ success() }}
+        uses: tsickert/discord-webhook@v5.3.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          embed-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          embed-title: "Unit Test Succeed :white_check_mark:"
+          embed-description: |
+            commit - ${{ github.event.head_commit.message }}
+            branch - `${{ github.ref_name }}`
+          embed-color: 5763719
+      - name: discord-notification-failure
+        if: failure() || cancelled()
+        uses: tsickert/discord-webhook@v5.3.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          embed-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          embed-title: "Unit Test failed :x:"
+          embed-description: |
+            commit - ${{ github.event.head_commit.message }}
+            branch - `${{ github.ref_name }}`
+          embed-color: 15548997

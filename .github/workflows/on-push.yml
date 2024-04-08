@@ -1,59 +1,41 @@
-name: Build Test
+name: Unit Test and build
 on:
   push:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: next
     steps:
       - name: checkout
         uses: actions/checkout@v3
-
-      - name: setup-node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: npm
-          cache-dependency-path: ./next/package-lock.json
-
-      - name: cache-node-modules
-        uses: actions/cache@v3
-        id: node_modules_cache_id
-        env:
-          cache-name: cache-node-modules
-        with:
-          working-directory: ./next
-          path: '**/node_modules'
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-
-      - name: npm-install
-        if: ${{ steps.node_modules_cache_id.outputs.cache-hit != 'true' }}
-        run: npm i
-        working-directory: ./next
-
-      - name: app-tests
-        working-directory: ./next
-        run: npm run tests
-
+      - uses: oven-sh/setup-bun@v1
+      - name: bun install
+        run: bun install
+      - name: run unit test
+        run: bun run test-unit
+      - name: build test
+        run: bun run build
       - name: discord-notification-success
         if: ${{ success() }}
         uses: tsickert/discord-webhook@v5.3.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
           embed-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          embed-title: "Success to Build Test :white_check_mark:"
+          embed-title: "Unit Test Succeed :white_check_mark:"
           embed-description: |
             commit - ${{ github.event.head_commit.message }}
             branch - `${{ github.ref_name }}`
           embed-color: 5763719
-
       - name: discord-notification-failure
         if: ${{ failure() }}
         uses: tsickert/discord-webhook@v5.3.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
           embed-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          embed-title: "Failure to Build Test :x:"
+          embed-title: "Unit Test failed :x:"
           embed-description: |
             commit - ${{ github.event.head_commit.message }}
             branch - `${{ github.ref_name }}`
