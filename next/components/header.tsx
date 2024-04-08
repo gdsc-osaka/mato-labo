@@ -1,7 +1,6 @@
 import Image from "next/image";
 import {getServerSession} from "next-auth/next";
 import {authOptions} from "@/options";
-import {redirect} from "next/navigation";
 import Link from "next/link";
 import {Button} from "@/components/ui/button";
 
@@ -17,7 +16,7 @@ export default async function Header() {
             </Link>
             {user && user.image &&
                 <img src={user.image} alt={'user-icon'} width={40} height={40}
-                     className={'rounded-full'}/>
+                    className={'rounded-full'}/>
             }
             {session === null &&
                 <Link href={'/signin'}>

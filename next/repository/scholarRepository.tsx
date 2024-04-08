@@ -1,17 +1,38 @@
-import {RawScholar, RawScholarForCreate} from "@/domain/types";
-import {prisma} from "@/repository/prisma";
+import {RawPaperForCreate, RawScholar, RawScholarForCreate} from "@/domain/types";
+import {prisma, TransactionPrismaClient} from "@/repository/prisma";
 
 export interface IScholarRepository {
     findManyByLabo(laboId: string): Promise<RawScholar[]>;
-    createMany(scholars: RawScholarForCreate[]): Promise<void>;
+
+    /**
+     * PaperとScholarを同時にcreateする
+     * @param scholars
+     * @param papers researchMapId と paper オブジェクト配列の Map
+     * @param client Transaction を使うときに PrismaClient を入れる
+     */
+    createMany(scholars: RawScholarForCreate[], papers: Map<string, RawPaperForCreate[]>, client?: TransactionPrismaClient): Promise<void>;
 }
 
 export class ScholarRepository implements IScholarRepository{
-    async createMany(scholars: RawScholarForCreate[]): Promise<void> {
+    async createMany(scholars: RawScholarForCreate[], papers: Map<string, RawPaperForCreate[]>, client?: TransactionPrismaClient): Promise<void> {
         try {
-            await prisma.scholar.createMany({
-                data: scholars
-            })
+            const promise = (tx: TransactionPrismaClient) => Promise.all(
+                scholars.map(scholar => tx.scholar.create({
+                    data: {
+                        ...scholar,
+                        papers: {
+                            create: papers.get(scholar.researchMapId ?? '') ?? []
+                        }
+                    }
+                }))
+            );
+
+            if (!client) {
+                await prisma.$transaction(tx => promise(tx));
+                return;
+            }
+
+            await promise(client);
         } catch (e) {
             console.error(e);
             return Promise.reject(e);

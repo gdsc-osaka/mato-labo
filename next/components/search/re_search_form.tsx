@@ -34,9 +34,9 @@ export default function ReSearchForm({defaultValue, disciplines}: {
     return (
         <form className={'bg-card flex flex-col gap-6'} onSubmit={handleSearch}>
             <Input placeholder={'フリーワード検索'} defaultValue={defaultValue.q} name={'keyword'}
-                   label={<Label htmlFor={'free-word-search'}>フリーワード検索</Label>}/>
+                label={<Label htmlFor={'free-word-search'}>フリーワード検索</Label>}/>
             <Input placeholder={'大学名で検索'} name={'university'}
-                   label={<Label htmlFor={'university-search'}>大学名で検索</Label>}/>
+                label={<Label htmlFor={'university-search'}>大学名で検索</Label>}/>
             <SelectDiscipline name={'discipline'} defaultValue={defaultValue.dis} disciplines={disciplines}/>
             <SelectRegion name={'region'} defaultValue={defaultValue.region}/>
             <SelectPrefecture name={'prefecture'} defaultValue={defaultValue.pref}/>

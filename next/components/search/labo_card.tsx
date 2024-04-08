@@ -7,7 +7,7 @@ export const LaboCard = ({labo}: { labo: Laboratory }) => {
     return (
         <article className={'relative border border-outline p-4 paper'}>
             <Link href={`/labo/${labo.id}`}
-                  className={css`
+                className={css`
                     position: absolute;
                     top: 0;
                     right: 0;
@@ -29,7 +29,7 @@ export const LaboCard = ({labo}: { labo: Laboratory }) => {
             <p className={'text-outline text-sm'}>{labo.major}</p>
             <div className={'relative z-10'}>
                 <a href={labo.websiteUrl} target={"_blank"} rel={"noopener noreferrer"}
-                   className={'text-sm pt-2 break-all link'}>
+                    className={'text-sm pt-2 break-all link'}>
                     {labo.websiteUrl}
                 </a>
             </div>

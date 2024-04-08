@@ -126,9 +126,9 @@ model Scholar {
 
 model Paper {
   id        Int      @id @default(autoincrement())
-  url       String
-  Scholar   Scholar? @relation(fields: [scholarId], references: [id])
-  scholarId String?
+  url       String   @unique
+  Scholar   Scholar  @relation(fields: [scholarId], references: [id])
+  scholarId String
 }
 
 // Auth

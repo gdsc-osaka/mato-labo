@@ -1,10 +1,4 @@
 import {SearchBox} from "@/components/search";
-import {
-    scrapeLaboratoryWebsite,
-    scrapeAbstract,
-    summarizeAbstracts
-} from "@/crawler/scraper";
-import {PaperData} from "@/crawler/types";
 
 export default function Home() {
     async function testAction() {

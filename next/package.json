@@ -6,8 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "test": "vitest --coverage"
+    "lint": "next lint --fix",
+    "test-unit": "vitest --coverage tests/unit",
+    "test-inte": "vitest --coverage tests/integration",
+    "test-e2e": "vitest --coverage tests/e2e"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^1.4.0",

@@ -10,7 +10,7 @@ export const Sidebar = ({websiteUrl, email, telNumber}: {
         <aside className={'bg-card flex flex-col gap-4 p-4'}>
             <SidebarInfoRow icon={<LanguageIcon size={20}/>} label={"ホームページ"}>
                 <a href={websiteUrl} target={"_blank"} rel={"noopener noreferrer"}
-                   className={'text-sm link text-nowrap'}>
+                    className={'text-sm link text-nowrap'}>
                     {websiteUrl}
                 </a>
             </SidebarInfoRow>
@@ -21,7 +21,7 @@ export const Sidebar = ({websiteUrl, email, telNumber}: {
             </SidebarInfoRow>
             <SidebarInfoRow icon={<MailIcon size={20}/>} label={"メール"}>
                 <a href={`mailto:${email}`} target={"_blank"} rel={"noopener noreferrer"}
-                   className={'text-sm break-all link'}>
+                    className={'text-sm break-all link'}>
                     {email}
                 </a>
             </SidebarInfoRow>

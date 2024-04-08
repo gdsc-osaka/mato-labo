@@ -1,4 +1,5 @@
-import {PrismaClient} from "@prisma/client";
+import {Prisma, PrismaClient} from "@prisma/client";
+import {DefaultArgs} from "@prisma/client/runtime/library";
 
 // let isConnected = false;
 //
@@ -11,4 +12,5 @@ import {PrismaClient} from "@prisma/client";
 //     return prisma;
 // }
 
+export type TransactionPrismaClient =  Omit<PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">
 export const prisma = new PrismaClient();

@@ -71,14 +71,14 @@ export default async function Page({ params }: { params: { id: string } }) {
                     <hr/>
                     <div className={'flex flex-row gap-2'}>
                         {labo.tags.map(tag => (
-                            <Link href={`/tags/${tag.tagId}`}>
+                            <Link href={`/tags/${tag.tagId}`} key={`link-${tag.tagId}`}>
                                 <TagChip>{tag.tagId}</TagChip>
                             </Link>
                         ))}
                     </div>
                     <div className={'p-4 flex flex-col gap-3 paper'}>
                         <h2 className={'text-lg'}>研究内容</h2>
-                        <p className={'text-sm text-neutral-700'}>{labo.paperSummary}</p>
+                        <p className={'text-sm text-neutral-700'}>{labo.paperSummary_en}</p>
                         <p className={'text-xs text-neutral-500'}>
                             注意: こちらの情報は直近3年の論文のAbstractを大規模言語モデルを用いて要約したものです。詳しい内容は引用元論文及び研究室のホームページを参照してください。
                         </p>
@@ -86,7 +86,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                     <div>
                         <h2 className={'text-lg'}>メンバー</h2>
                         {scholars.map(scholar => (
-                            <p>{scholar.name}</p>
+                            <p key={`scholar-${scholar.id}`}>{scholar.name_ja}</p>
                         ))}
                     </div>
                     <div>

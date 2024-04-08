@@ -1,6 +1,6 @@
 import {describe, test} from "vitest";
 
-describe("object_utils test", () => {
+describe("object_utils tests", () => {
     test("Test: removeEmptyFields", () => {
 
     })

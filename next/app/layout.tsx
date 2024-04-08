@@ -23,17 +23,17 @@ export default async function RootLayout({children}: {
     // const session = await getServerSession(authOptions);
     return (
         <html lang="en">
-        <head>
-            <link rel={'icon'} href={'image/favicon.ico'}/>
-            <link rel="stylesheet"
-                  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
-        </head>
-        <body className={notoSansJP.className}>
-        <Header/>
-        <KumaRegistry>
-            {children}
-        </KumaRegistry>
-        </body>
+            <head>
+                <link rel={'icon'} href={'image/favicon.ico'}/>
+                <link rel="stylesheet"
+                    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+            </head>
+            <body className={notoSansJP.className}>
+                <Header/>
+                <KumaRegistry>
+                    {children}
+                </KumaRegistry>
+            </body>
         </html>
     )
 }
