@@ -9,6 +9,7 @@ import {
 } from "@/crawler/scraper";
 import {RawPaperForCreate, RawScholarForCreate} from "@/domain/types";
 import {prisma} from "@/repository/prisma";
+import {ITransactionRepository} from "@/repository/transactionRepository";
 
 export interface ILaboratoryService {
     updateLaboratory(laboId: string): Promise<void>;
@@ -17,7 +18,8 @@ export interface ILaboratoryService {
 export class LaboratoryService implements ILaboratoryService {
     constructor(
         private laboratoryRepository: ILaboratoryRepository,
-        private scholarRepository: IScholarRepository
+        private scholarRepository: IScholarRepository,
+        private transactionRepository: ITransactionRepository,
     ) {
     }
 
