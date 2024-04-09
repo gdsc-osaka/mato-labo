@@ -12,7 +12,7 @@ export type InstitutionType = z.infer<typeof InstitutionTypeSchema>;
 export type University = Prisma.UniversityGetPayload<{}>;
 
 export type Laboratory = Prisma.LaboratoryGetPayload<{
-    include: {university: true, discipline: true, tags: true}
+    include: {university: true, graduateSchool: true, major: true, discipline: true, tags: true}
 }>
 
 export type RawLaboratory = Prisma.LaboratoryGetPayload<{}>;
@@ -21,7 +21,7 @@ export type GraduateSchool = Prisma.GraduateSchoolGetPayload<{}>;
 
 export type Major = Prisma.MajorGetPayload<{}>;
 
-export type Discipline = Prisma.AcademicDisciplineGetPayload<{}>;
+export type Discipline = Prisma.DisciplineGetPayload<{}>;
 
 export type Tag = Prisma.TagGetPayload<{}>;
 

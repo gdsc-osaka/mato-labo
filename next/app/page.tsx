@@ -1,30 +1,79 @@
 import {SearchBox} from "@/components/search";
+import {UniversityRepository} from "@/repository/universityRepository";
+import {GraduateSchoolRepository} from "@/repository/graduateSchoolRepository";
+import {MajorRepository} from "@/repository/majorRepository";
+import {LaboratoryRepository} from "@/repository/laboratoryRepository";
+import {DisciplineRepository} from "@/repository/disciplineRepository";
+import {LaboratoryService} from "@/service/laboratoryService";
+import {LaboratoryScraper} from "@/crawler/scraper";
+import {ScholarRepository} from "@/repository/scholarRepository";
+import {TransactionRepository} from "@/repository/transactionRepository";
+import {TagRepository} from "@/repository/tagRepository";
+import {PaperRepository} from "@/repository/paperRepository";
+import {Browser} from "@/crawler/browser";
+
+const universityRepository = new UniversityRepository();
+const gSchoolRepository = new GraduateSchoolRepository();
+const majorRepository = new MajorRepository();
+const disciplineRepository = new DisciplineRepository();
+const laboRepository = new LaboratoryRepository();
+const tagRepository = new TagRepository();
+const paperRepository = new PaperRepository();
+
+const scholarRepository = new ScholarRepository();
+const transactionRepository = new TransactionRepository();
+const laboScraper = new LaboratoryScraper(new Browser());
+const laboService = new LaboratoryService(
+    laboRepository,
+    scholarRepository,
+    paperRepository,
+    transactionRepository,
+    laboScraper,
+);
 
 export default function Home() {
     async function testAction() {
         'use server';
 
-        // const laboWebsite = await scrapeLaboratoryWebsite(new URL("https://www-mura.ist.osaka-u.ac.jp/"));
-        // console.log("[Scrape] " + JSON.stringify(laboWebsite,null,'  '));
-        // const professor = laboWebsite?.member.staff.find(m => m.position === "教授");
-        // if (!professor) {
-        //     console.error("[Scrape] Couldn't find professor");
-        //     return;
-        // }
-        // const affiliationName = "大阪大学";
-        // const researchMap = await scrapeResearchMap(professor.name, affiliationName);
-        // console.log("[Scrape] " + JSON.stringify(researchMap,null,'  '));
-        //
-        // const papers = new Array<PaperData>();
-        //
-        // for (const paperUrl of researchMap.paperUrls) {
-        //     const abstract = await scrapeAbstract(paperUrl);
-        //     papers.push({srcUrl: paperUrl, abstract})
-        // }
-        //
-        // const result = await summarizeAbstracts(papers.map(p => p.abstract));
-        // console.log(result);
+        // const univ = await universityRepository.create({
+        //     institution: "PUBLIC",
+        //     name: "大阪大学",
+        //     url: "https://www.osaka-u.ac.jp/"
+        // });
+        // const gSchool = await gSchoolRepository.create({
+        //     univId: univ.id,
+        //     url: "https://www.ist.osaka-u.ac.jp/"
+        // });
+        // const major = await majorRepository.create({
+        //     graduateSchoolId: gSchool.id,
+        //     url: "https://www.ist.osaka-u.ac.jp/japanese/majors/nw.php"
+        // });
+        // const discipline = await disciplineRepository.create({
+        //     name: "情報科学", type: "FORMAL"
+        // });
+        // const labo = await laboRepository.create({
+        //     univId: univ.id,
+        //     graduateSchoolId: gSchool.id,
+        //     majorId: major.id,
+        //     access: [],
+        //     name: "先進ネットワークアーキテクチャ講座",
+        //     seminarName: "村田研究室",
+        //     websiteUrl: "https://www-mura.ist.osaka-u.ac.jp/",
+        //     prefectureId: 27,
+        //     disciplineId: discipline.id,
+        //     laboType: 'DEFAULT',
+        //     address: null,
+        //     email: null,
+        //     fax: null,
+        //     paperSummary_en: null,
+        //     paperSummary_ja: null,
+        //     postCode: null,
+        //     telNumber: null,
+        // })
+        // await laboService.updateLaboratory("clus5nn1m00065fkoh05m930c");
 
+        // await tagRepository.create({id: "大阪大学"}, "clus5nn1m00065fkoh05m930c");
+        await laboService.updatePaperSummary("clus5nn1m00065fkoh05m930c");
     }
 
     return (
@@ -36,63 +85,3 @@ export default function Home() {
         </main>
     )
 }
-
-const exampleLaboJson = "{" +
-    "  \"member\": {" +
-    "    \"staff\": [" +
-    "      {" +
-    "        \"name\": \"村田正之\"," +
-    "        \"name_en\": \"Masayuki Murata\"," +
-    "        \"position\": \"教授\"," +
-    "        \"position_en\": \"Professor\"," +
-    "        \"email\": \"murata@ist.osaka-u.ac.jp\"" +
-    "      }," +
-    "      {" +
-    "        \"name\": \"長谷川　聡\"," +
-    "        \"name_en\": \"Satoshi Hasegawa\"," +
-    "        \"position\": \"特任教授\"," +
-    "        \"position_en\": \"特任教授\"," +
-    "        \"email\": null" +
-    "      }," +
-    "      {" +
-    "        \"name\": \"荒川　慎一\"," +
-    "        \"name_en\": \"Shinichi Arakawa\"," +
-    "        \"position\": \"特任教授\"," +
-    "        \"position_en\": \"特任教授\"," +
-    "        \"email\": \"arakawa@ist.osaka-u.ac.jp\"" +
-    "      }," +
-    "      {" +
-    "        \"name\": \"小南　大智\"," +
-    "        \"name_en\": \"Daichi Kominiami\"," +
-    "        \"position\": \"特任助教\"," +
-    "        \"position_en\": \"特任助教\"," +
-    "        \"email\": \"kominiami@ist.osaka-u.ac.jp\"" +
-    "      }," +
-    "      {" +
-    "        \"name\": \"岸野　恭彦\"," +
-    "        \"name_en\": \"Yoshihiko Kishimo\"," +
-    "        \"position\": \"特任助教\"," +
-    "        \"position_en\": \"特任助教\"," +
-    "        \"email\": \"yoshino@ist.osaka-u.ac.jp\"" +
-    "      }," +
-    "      {" +
-    "        \"name\": \"アルパルサン　オンル\"," +
-    "        \"name_en\": \"Alparslan Onur\"," +
-    "        \"position\": \"特任助教\"," +
-    "        \"position_en\": \"特任助教\"," +
-    "        \"email\": \"onur@ist.osaka-u.ac.jp\"" +
-    "      }" +
-    "    ]," +
-    "    \"student\": []" +
-    "  }," +
-    "  \"access\": {" +
-    "    \"post_code\": \"565-0871\"," +
-    "    \"address\": \"大阪府吹田市山田丘1-5\"," +
-    "    \"tel_number\": \"06-6879-4118\"," +
-    "    \"fax\": \"06-6879-4119\"," +
-    "    \"access\": [" +
-    "      \"大阪モノレール　阪大病院前駅　下車　徒歩15分\"," +
-    "      \"阪急バス　阪大本部前バス停　下車　徒歩5分\"" +
-    "    ]" +
-    "  }" +
-    "}";

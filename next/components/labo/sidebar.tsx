@@ -2,29 +2,35 @@ import {ReactNode} from "react";
 import {CallIcon, LanguageIcon, MailIcon} from "@/components/ui/icons";
 
 export const Sidebar = ({websiteUrl, email, telNumber}: {
-    websiteUrl: string,
-    email: string,
-    telNumber: string
+    websiteUrl: string | null,
+    email: string | null,
+    telNumber: string | null
 }) => {
     return (
         <aside className={'bg-card flex flex-col gap-4 p-4'}>
-            <SidebarInfoRow icon={<LanguageIcon size={20}/>} label={"ホームページ"}>
-                <a href={websiteUrl} target={"_blank"} rel={"noopener noreferrer"}
-                    className={'text-sm link text-nowrap'}>
-                    {websiteUrl}
-                </a>
-            </SidebarInfoRow>
-            <SidebarInfoRow icon={<CallIcon size={20}/>} label={"電話"}>
-                <p className={'text-sm break-all'}>
-                    {telNumber}
-                </p>
-            </SidebarInfoRow>
-            <SidebarInfoRow icon={<MailIcon size={20}/>} label={"メール"}>
-                <a href={`mailto:${email}`} target={"_blank"} rel={"noopener noreferrer"}
-                    className={'text-sm break-all link'}>
-                    {email}
-                </a>
-            </SidebarInfoRow>
+            {websiteUrl && (
+                <SidebarInfoRow icon={<LanguageIcon size={20}/>} label={"ホームページ"}>
+                    <a href={websiteUrl} target={"_blank"} rel={"noopener noreferrer"}
+                       className={'text-sm link text-nowrap'}>
+                        {websiteUrl}
+                    </a>
+                </SidebarInfoRow>
+            )}
+            {telNumber && (
+                <SidebarInfoRow icon={<CallIcon size={20}/>} label={"電話"}>
+                    <p className={'text-sm break-all'}>
+                        {telNumber}
+                    </p>
+                </SidebarInfoRow>
+            )}
+            {email && (
+                <SidebarInfoRow icon={<MailIcon size={20}/>} label={"メール"}>
+                    <a href={`mailto:${email}`} target={"_blank"} rel={"noopener noreferrer"}
+                       className={'text-sm break-all link'}>
+                        {email}
+                    </a>
+                </SidebarInfoRow>
+            )}
         </aside>
     )
 }

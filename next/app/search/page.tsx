@@ -50,6 +50,7 @@ export default async function SearchPage({searchParams}: { searchParams: SearchP
     const labos = await searchLaboratories(searchParams);
     const disciplines = await fetchDisciplines();
 
+    console.log(labos);
     return (
         <main className={'p-6 flex flex-row gap-8'}>
             <aside className={'bg-card flex flex-col gap-4 p-4'}>

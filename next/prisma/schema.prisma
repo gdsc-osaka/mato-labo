@@ -28,7 +28,7 @@ enum ScienceType {
 }
 
 /// 学問分野. ~~学
-model AcademicDiscipline {
+model Discipline {
   id           Int          @id @default(autoincrement())
   name         String
   type         ScienceType
@@ -44,7 +44,7 @@ enum LaboType {
 }
 
 model University {
-  id              Int              @id @default(autoincrement())
+  id              String           @id @default(cuid())
   name            String
   url             String
   createdAt       DateTime         @default(now())
@@ -58,20 +58,22 @@ model University {
 model GraduateSchool {
   id           String       @id @default(cuid())
   url          String
-  university   University   @relation(fields: [universityId], references: [id])
-  universityId Int
+  name         String // ~~研究科
+  university   University   @relation(fields: [univId], references: [id])
+  univId       String
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   majors       Major[]
   laboratories Laboratory[]
 
-  @@index([universityId])
+  @@index([univId])
 }
 
 /// ~~~専攻. 専攻ごとにWebサイトがあるところもあるので正規化した
 model Major {
   id               String         @id @default(cuid())
   url              String
+  name             String // ~~専攻
   graduateSchool   GraduateSchool @relation(fields: [graduateSchoolId], references: [id])
   graduateSchoolId String
   createdAt        DateTime       @default(now())
@@ -84,26 +86,26 @@ model Major {
 model Laboratory {
   id               String               @id @default(cuid())
   university       University           @relation(fields: [univId], references: [id])
-  univId           Int
-  discipline       AcademicDiscipline   @relation(fields: [disciplineId], references: [id]) //
-  disciplineId     Int
+  univId           String
   graduateSchool   GraduateSchool       @relation(fields: [graduateSchoolId], references: [id])
   graduateSchoolId String
   major            Major                @relation(fields: [majorId], references: [id])
   majorId          String
+  discipline       Discipline           @relation(fields: [disciplineId], references: [id]) //
+  disciplineId     Int
   name             String // ~~~~講座
   seminarName      String // ~~~~研究室
   websiteUrl       String
-  email            String
-  telNumber        String // 電話番号
-  fax              String // FAX番号
-  postCode         String // 郵便番号
-  access           String[] // 研究室へのアクセス情報
-  address          String // 住所
-  paperSummary_ja  String // 論文の要約
-  paperSummary_en  String
   prefectureId     Int // 1~47の数字. 別途APIを作成して管理する
   laboType         LaboType
+  email            String?
+  telNumber        String? // 電話番号
+  fax              String? // FAX番号
+  postCode         String? // 郵便番号
+  access           String[] // 研究室へのアクセス情報
+  address          String? // 住所
+  paperSummary_ja  String? // 論文の要約
+  paperSummary_en  String?
   createdAt        DateTime             @default(now())
   updatedAt        DateTime             @updatedAt
   scholars         Scholar[]
@@ -118,7 +120,6 @@ model Laboratory {
 
 model Tag {
   id           String               @id
-  name         String               @unique
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
   laboratories TagsOnLaboratories[]
@@ -130,7 +131,7 @@ model TagsOnLaboratories {
   tag        Tag        @relation(fields: [tagId], references: [id])
   tagId      String
   assignedAt DateTime   @default(now())
-  assignedBy String
+  assignedBy String?
 
   @@id([laboId, tagId])
   @@index([laboId])
@@ -143,7 +144,7 @@ model Scholar {
   laboId          String
   name_ja         String
   name_en         String?
-  position_ja     String
+  position_ja     String?
   position_en     String?
   email           String?    @unique
   telNumber       String?
@@ -158,9 +159,9 @@ model Scholar {
 }
 
 model Paper {
-  id        Int     @id @default(autoincrement())
+  id        String  @id @default(cuid())
   url       String  @unique
-  Scholar   Scholar @relation(fields: [scholarId], references: [id])
+  scholar   Scholar @relation(fields: [scholarId], references: [id])
   scholarId String
 }
 

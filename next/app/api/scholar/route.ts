@@ -9,7 +9,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const laboId = params.get("labo");
 
         if (laboId !== null && laboId !== '') {
-            const results = await scholarRepository.findManyByLabo(laboId);
+            const results = await scholarRepository.findMany({laboId});
             return NextResponse.json(results);
         }
 

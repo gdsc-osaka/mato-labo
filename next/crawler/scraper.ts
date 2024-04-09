@@ -1,4 +1,4 @@
-import {Browser} from "@/crawler/browser";
+import {IBrowser} from "@/crawler/browser";
 import {callAI, callAIWithImage, extractJsonFromResult} from "@/crawler/gemini";
 import {Access, accessSchema, MemberData, membersDataSchema} from "@/crawler/types";
 import {ElementHandle} from "puppeteer";
@@ -18,68 +18,84 @@ const abstractSummarySchema = z.custom<AbstractSummary>();
 
 export interface ILaboratoryScraper {
     scrapeLaboratoryWebsite(laboUrl: URL): Promise<LaboWebsite>;
+
     findResearchMapId(name: string, affiliation: string): Promise<string | null>;
+
     findPaperUrls(researchMapId: string): Promise<string[]>;
-    scrapeAbstract(paperUrl: string): Promise<string | undefined>;
+
+    scrapeAbstract(paperUrl: URL): Promise<string | undefined>;
+
     summarizeAbstracts(abstractText: string[]): Promise<AbstractSummary | undefined>;
 }
 
+const logger = {
+    log(msg: unknown) {
+        console.log(`[Scraper:LOG] ${msg}`)
+    },
+    error(err: unknown) {
+        console.error(`[Scraper:ERR] ${err}`);
+    }
+}
+
 export class LaboratoryScraper implements ILaboratoryScraper {
+    constructor(private browser: IBrowser) {
+    }
+
     /**
      * 指定されたURLから研究室のデータを取得します．該当する各データがない場合は undefined となります．
      * @param laboUrl 研究室のURL
      */
     async scrapeLaboratoryWebsite(laboUrl: URL): Promise<LaboWebsite> {
-        const browser = new Browser();
+        logger.log("starting scrapeLaboratoryWebsite()");
         let result: LaboWebsite = {};
 
         try {
-            await browser.launch(laboUrl);
-            result.member = await navigateAndScrape(browser, memberPrompt, membersDataSchema, "Members", "Member", "メンバー", "メンバ")
-            result.access = await navigateAndScrape(browser, accessPrompt, accessSchema, "Access", "アクセス", "Location", "About");
+            await this.browser.launch(laboUrl);
+            result.member = await navigateAndScrape(this.browser, memberPrompt, membersDataSchema, "Members", "Member", "メンバー", "メンバ")
+            result.access = await navigateAndScrape(this.browser, accessPrompt, accessSchema, "Access", "アクセス", "Location", "About");
         } catch (e) {
-            console.error(`[Crawler] ${e}`);
+            logger.error(e);
         } finally {
-            await browser.close();
+            await this.browser.close();
         }
 
         return result;
     }
 
     async findResearchMapId(name: string, affiliation: string): Promise<string | null> {
-        const browser = new Browser();
+        logger.log("starting findResearchMapId()");
         const searchParams = new URLSearchParams({name, affiliation});
         const url = `https://researchmap.jp/researchers?${searchParams.toString()}`
 
         try {
-            await browser.launch(new URL(url));
-            await browser.$texts(name);
-            const scholarUrl = browser.currentUrl();
+            await this.browser.launch(new URL(url));
+            await this.browser.$texts(name);
+            const scholarUrl = this.browser.currentUrl();
             return scholarUrl.pathname.substring(1);
         } catch (e) {
-            console.error(e);
+            logger.error(e);
             return null;
         } finally {
-            await browser.close();
+            await this.browser.close();
         }
     }
 
     async findPaperUrls(researchMapId: string): Promise<string[]> {
-        const browser = new Browser();
+        logger.log("starting findPaperUrls()");
         const url = `https://researchmap.jp/${researchMapId}/published_papers`
 
         try {
-            await browser.launch(new URL(url));
-            const paperElements = await browser.selectAll(".rm-cv-type-myself");
+            await this.browser.launch(new URL(url));
+            const paperElements = await this.browser.selectAll(".rm-cv-type-myself");
             const researchMapPaperURL = await Promise.all(
                 paperElements.map(el => el.$eval("a", (elm) => elm.href))
             );
             const paperUrls = new Array<string>();
 
             for (const paperUrl of researchMapPaperURL) {
-                await browser.goTo(new URL(paperUrl));
+                await this.browser.goTo(new URL(paperUrl));
 
-                const linkJoho = await browser.selectTextWithTag("dt", "リンク情報");
+                const linkJoho = await this.browser.selectTextWithTag("dt", "リンク情報");
                 if (!linkJoho) break;
                 const parent = await linkJoho.getProperty('parentNode');
                 if (parent instanceof ElementHandle) {
@@ -89,84 +105,79 @@ export class LaboratoryScraper implements ILaboratoryScraper {
             }
             return paperUrls;
         } catch (e) {
-            console.error(`[Crawler] ${e}`);
-            return Promise.reject(e);
+            logger.error(e);
+            return [];
         } finally {
-            await browser.close();
+            await this.browser.close();
         }
     }
 
-    async scrapeAbstract(paperUrl: string): Promise<string | undefined> {
-        const browser = new Browser();
+    async scrapeAbstract(paperUrl: URL): Promise<string | undefined> {
+        logger.log("starting scrapeAbstract()");
 
         try {
-            await browser.launch(new URL(paperUrl));
-            const page = await browser.currentPage();
-            if (!page) return Promise.reject("currentPage() is undefined.");
-
-            const screenshot = await browser.screenshot(true);
+            await this.browser.launch(paperUrl);
+            const screenshot = await this.browser.screenshot(true);
             const res = await callAIWithImage(abstractPrompt, screenshot);
-            const json = JSON.parse(res.response.text());
-
-            return json.abstract;
+            logger.log(`AI Response: ${res.response.text()}`)
+            return res.response.text();
         } catch (e) {
-            console.error(`[Crawler] ${e}`);
+            logger.error(e);
             return undefined;
         } finally {
-            await browser.close();
+            await this.browser.close();
         }
     }
 
     async summarizeAbstracts(abstractText: string[]): Promise<AbstractSummary | undefined> {
+        logger.log("starting summarizeAbstracts()");
         try {
-            const prompt = abstractPrompt + abstractText.map(text => `* ${text}`).join("\n");
+            const prompt = abstractSummaryPrompt + abstractText.map(text => `* ${text}`).join("\n");
             const res = await callAI(prompt);
-            console.log(`[AI] response: ${res.response.text()}`)
+            logger.log(`AI Response: ${res.response.text()}`)
             const json = JSON.parse(res.response.text());
             return abstractSummarySchema.parse(json);
         } catch (e) {
-            console.error(e);
+            logger.error(e);
             return undefined;
         }
     }
 
 }
 
-const navigateAndScrape = async <T extends ZodRawShape>(browser: Browser, prompt: string, schema: z.ZodObject<T>, ...linkTexts: string[]) => {
+const navigateAndScrape = async <T extends ZodRawShape>(browser: IBrowser, prompt: string, schema: z.ZodObject<T>, ...linkTexts: string[]) => {
     try {
         await browser.$texts(...linkTexts);
-        console.debug(`[Crawler] navigate to ${linkTexts.join(",")} complete.`)
         const screenshot = await browser.screenshot();
         const res = await callAIWithImage(prompt, screenshot);
-        console.debug(`[Crawler] AI response to ${linkTexts[0]}: ${res.response.text()}`)
         const json = extractJsonFromResult(res.response.text());
         const data = schema.parse(json);
-        console.debug(`[Crawler] ${linkTexts[0]} data: ${JSON.stringify(data)}`);
+        logger.log(`AI response to ${linkTexts[0]}: ${res.response.text()}`);
         return data;
     } catch (e) {
-        console.error(e);
+        logger.error(e);
         return undefined;
     }
 }
 
 const memberPrompt =
-    "このウェブページのスクリーンショットから，メンバーの情報を次のようなjsonで出力してください．" +
+    "このウェブページのスクリーンショットからメンバーの情報を読み取り，以下のjsonフォーマットで出力してください．" +
     "該当するデータがない場合は，null を入力してください． " +
     "{ " +
     "  \"staff\": [ " +
     "    { " +
-    "      \"name\": \"田中太郎\", " +
+    "      \"name_ja\": \"田中太郎\", " +
     "      \"name_en\": \"Taro Tanaka\", " +
-    "      \"position\": \"教授\", " +
+    "      \"position_ja\": \"教授\", " +
     "      \"position_en\": \"Professor\", " +
     "      \"email\": \"taro@example.com\" " +
     "    } " +
     "  ], " +
     "  \"student\": [ " +
     "    { " +
-    "      \"name\": \"山田花子\", " +
+    "      \"name_ja\": \"山田花子\", " +
     "      \"name_en\": \"Hanako Yamada\", " +
-    "      \"position\": \"博士前期課程\", " +
+    "      \"position_ja\": \"博士前期課程\", " +
     "      \"position_en\": \"Master Course\", " +
     "      \"email\": \"hanako@example.com\" " +
     "    } " +
@@ -174,9 +185,8 @@ const memberPrompt =
     "}".replaceAll("  ", "");
 
 const accessPrompt =
-    "このウェブページのスクリーンショットから，連絡先や住所の情報を次のようなjsonで出力してください．" +
-    "Markdownは使わないで，純粋なjsonだけを出力してください．" +
-    "該当するデータがない場合は，null を入力してください． " +
+    "このウェブページのスクリーンショットから連絡先と住所の情報を読み取り，以下のjsonフォーマットで出力してください．" +
+    "該当するデータがない場合は，null を入力してください．" +
     "{" +
     "  \"post_code\": \"123-4567\"," +
     "  \"address\": \"大阪府吹田市山田丘 1-5 大阪大学大学院 情報科学研究科 B棟4階 増澤研究室\"," +
@@ -188,13 +198,18 @@ const accessPrompt =
     "  ]" +
     "} ".replaceAll("  ", "");
 
-const abstractPrompt = "" +
-    "This is a list of abstracts of papers published by a laboratory. Using this list as a reference, please write a statement (300 words or less) that describes the research conducted by this laboratory. Then translate it into Japanese and output both English and Japanese version in json format below.\n" +
+const abstractPrompt = "Read and output the Abstract of the paper from the screenshot of this web page."
+
+const abstractSummaryPrompt = "" +
+    "This is a list of abstracts of papers published by a laboratory. " +
+    "Using this list as a reference, please write a statement (300 words or less) that describes the research conducted by this laboratory. " +
+    "Then translate it into Japanese and output both English and Japanese version in json format below. " +
+    "日本語訳は丁寧語にしてください．" +
     "\n" +
     "json format:\n" +
     "{\n" +
-    "  \"summary_en\": \"\",\n" +
-    "  \"summary_ja\": \"\"\n" +
+    "  \"paperSummary_en\": \"\",\n" +
+    "  \"paperSummary_ja\": \"\"\n" +
     "}\n" +
     "\n" +
     "abstract list:"

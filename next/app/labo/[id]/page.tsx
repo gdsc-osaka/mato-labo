@@ -78,7 +78,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                     </div>
                     <div className={'p-4 flex flex-col gap-3 paper'}>
                         <h2 className={'text-lg'}>研究内容</h2>
-                        <p className={'text-sm text-neutral-700'}>{labo.paperSummary_en}</p>
+                        <p className={'text-sm text-neutral-700'}>{labo.paperSummary_ja}</p>
                         <p className={'text-xs text-neutral-500'}>
                             注意: こちらの情報は直近3年の論文のAbstractを大規模言語モデルを用いて要約したものです。詳しい内容は引用元論文及び研究室のホームページを参照してください。
                         </p>
