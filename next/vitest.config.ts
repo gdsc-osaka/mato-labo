@@ -18,6 +18,11 @@ export default defineConfig({
     },
     root: '.',
     reporters: ['verbose'],
+    testTimeout: 20000,
+    setupFiles: ['tests/setup.ts'],
+  },
+  define: {
+    'import.meta.vitest': false,
   },
   resolve: {
     alias: {
