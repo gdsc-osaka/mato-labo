@@ -1,7 +1,7 @@
 import {prisma, TransactionPrismaClient} from "@/repository/prisma";
-import {Laboratory, RawLaboratory, RawLaboratoryForUpdate} from "@/domain/types";
+import {ForUpdate, Laboratory, RawLaboratory} from "@/domain/types";
 
-type Query = {
+export type Query = {
     keyword?: string;
     prefectureIds?: number[];
     disciplineIds?: number[];
@@ -12,7 +12,7 @@ export interface ILaboratoryRepository {
     findMany(query: Query): Promise<Laboratory[]>;
     find(id: string): Promise<Laboratory | null>;
     create(laboratory: Omit<RawLaboratory, "id" | "createdAt" | "updatedAt">): Promise<RawLaboratory>;
-    update(laboratory: RawLaboratoryForUpdate, client?: TransactionPrismaClient): Promise<void>;
+    update(laboratory: ForUpdate<RawLaboratory>, client?: TransactionPrismaClient): Promise<void>;
 }
 
 export class LaboratoryRepository implements ILaboratoryRepository {
@@ -78,7 +78,7 @@ export class LaboratoryRepository implements ILaboratoryRepository {
         }
     }
 
-    async update(laboratory: RawLaboratoryForUpdate, client: TransactionPrismaClient = prisma): Promise<void> {
+    async update(laboratory: ForUpdate<RawLaboratory>, client: TransactionPrismaClient = prisma): Promise<void> {
         try {
             await client.laboratory.update({
                 where: {
