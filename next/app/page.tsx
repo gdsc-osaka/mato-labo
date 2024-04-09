@@ -72,8 +72,8 @@ export default function Home() {
         // })
         // await laboService.updateLaboratory("clus5nn1m00065fkoh05m930c");
 
-        // await tagRepository.create({id: "大阪大学"}, "clus5nn1m00065fkoh05m930c");
-        await laboService.updatePaperSummary("clus5nn1m00065fkoh05m930c");
+        // await tagRepository.create({id: "情報科学研究科"}, "clus5nn1m00065fkoh05m930c");
+        // await laboService.updatePaperSummary("clus5nn1m00065fkoh05m930c");
     }
 
     return (

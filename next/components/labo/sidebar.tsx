@@ -1,10 +1,14 @@
 import {ReactNode} from "react";
-import {CallIcon, LanguageIcon, MailIcon} from "@/components/ui/icons";
+import {CallIcon, FaxIcon, HomeIcon, LanguageIcon, MailIcon, TrainIcon} from "@/components/ui/icons";
 
-export const Sidebar = ({websiteUrl, email, telNumber}: {
+export const Sidebar = ({websiteUrl, email, telNumber, fax, address, access, postCode}: {
     websiteUrl: string | null,
     email: string | null,
-    telNumber: string | null
+    telNumber: string | null,
+    fax: string | null,
+    address: string | null,
+    access: string[],
+    postCode: string
 }) => {
     return (
         <aside className={'bg-card flex flex-col gap-4 p-4'}>
@@ -23,12 +27,37 @@ export const Sidebar = ({websiteUrl, email, telNumber}: {
                     </p>
                 </SidebarInfoRow>
             )}
+            {fax && (
+                <SidebarInfoRow icon={<FaxIcon size={20}/>} label={"FAX"}>
+                    <p className={'text-sm break-all'}>
+                        {fax}
+                    </p>
+                </SidebarInfoRow>
+            )}
             {email && (
                 <SidebarInfoRow icon={<MailIcon size={20}/>} label={"メール"}>
                     <a href={`mailto:${email}`} target={"_blank"} rel={"noopener noreferrer"}
                        className={'text-sm break-all link'}>
                         {email}
                     </a>
+                </SidebarInfoRow>
+            )}
+            {address && (
+                <SidebarInfoRow icon={<HomeIcon size={20}/>} label={"住所"}>
+                    <p className={'text-sm break-all max-w-md'}>
+                        {address}
+                    </p>
+                </SidebarInfoRow>
+            )}
+            {access.length > 0 && (
+                <SidebarInfoRow icon={<TrainIcon size={20}/>} label={"アクセス"}>
+                    <div className={"flex flex-col"}>
+                        {access.map(a => (
+                            <p className={'text-sm break-all max-w-md'}>
+                                {a}
+                            </p>
+                        ))}
+                    </div>
                 </SidebarInfoRow>
             )}
         </aside>

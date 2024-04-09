@@ -15,7 +15,7 @@ export default async function Header() {
                 <Image src={'/logo.svg'} alt={'labomato-logo'} width={81.5 * 1.5} height={22 * 1.5}/>
             </Link>
             {user && user.image &&
-                <Image src={user.image} alt={'user-icon'} width={40} height={40}
+                <img src={user.image} alt={'user-icon'} width={40} height={40}
                     className={'rounded-full'}/>
             }
             {session === null &&

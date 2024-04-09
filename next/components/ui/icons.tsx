@@ -35,6 +35,30 @@ export const MailIcon = (props: MaterialSymbolProp) => {
     );
 };
 
+export const HomeIcon = (props: MaterialSymbolProp) => {
+    return (
+        <MaterialSymbol {...props}>
+            home
+        </MaterialSymbol>
+    );
+};
+
+export const FaxIcon = (props: MaterialSymbolProp) => {
+    return (
+        <MaterialSymbol {...props}>
+            fax
+        </MaterialSymbol>
+    );
+};
+
+export const TrainIcon = (props: MaterialSymbolProp) => {
+    return (
+        <MaterialSymbol {...props}>
+            train
+        </MaterialSymbol>
+    );
+};
+
 type MaterialSymbolProp = {
     className?: string,
     size?: 20 | 24 | 48
