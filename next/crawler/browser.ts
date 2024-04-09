@@ -1,11 +1,16 @@
-import puppeteer, {Browser as PBrowser, Page} from "puppeteer";
+import puppeteer, {Browser as PBrowser, ElementHandle, HTTPResponse, Page} from "puppeteer";
 
 export interface IBrowser {
-    launch(url: URL): Promise<void>;
-    currentUrl(): URL;
-    $texts(...linkText: string[]): Promise<void>;
-    $class(className: string): Promise<void>;
-    scrollTo(text: string): Promise<void>;
+    launch(url: URL): Promise<void>
+    currentUrl(): URL
+    $texts(...linkText: string[]): Promise<void>
+    $class(className: string): Promise<void>
+    scrollTo(text: string): Promise<void>
+    close(): Promise<void>
+    selectAll(selector: string): Promise<ElementHandle<Element>[]>
+    selectTextWithTag(tag: string, ...text: string[]): Promise<ElementHandle | null>
+    goTo(url: URL): Promise<HTTPResponse | null>
+    screenshot(full?: boolean): Promise<Buffer>
 }
 
 export class Browser implements IBrowser {
@@ -16,10 +21,10 @@ export class Browser implements IBrowser {
 
     async launch(url: URL) {
         try {
-            const browser = await puppeteer.launch({
+            this.browser = await puppeteer.launch({
                 headless: false,
             });
-            this.page = await browser.newPage();
+            this.page = await this.browser.newPage();
             await this.page.setViewport({ width: 1920, height: 1080 });
             await this.page.goto(url.toString(), {"waitUntil": "domcontentloaded"});
         } catch (e) {
@@ -62,8 +67,9 @@ export class Browser implements IBrowser {
         }
     }
 
-    goTo(url: URL) {
-        return this.page?.goto(url.toString());
+    goTo(url: URL): Promise<HTTPResponse | null> {
+        if (!this.page) throw new Error("this.page is null");
+        return this.page.goto(url.toString());
     }
 
     goBack() {
@@ -86,16 +92,17 @@ export class Browser implements IBrowser {
         return new URL(this.page.url());
     }
 
-    selectTextWithTag(tag: string, ...text: string[]) {
+    selectTextWithTag(tag: string, ...text: string[]): Promise<ElementHandle | null> {
+        if (!this.page) throw new Error("this.page is null");
         const selector = `::-p-xpath(${text.map(t => `//${tag}[contains(text(), '${t}')]`).join(' | ')})`;
-        return this.page?.$(selector)
+        return this.page.$(selector)
     }
 
     currentPage() {
         return this.page;
     }
 
-    selectAll(selector: string) {
+    selectAll(selector: string): Promise<ElementHandle[]> {
         if (!this.page) throw new Error("this.page is null");
         return this.page.$$(selector);
     }
@@ -112,4 +119,50 @@ export class Browser implements IBrowser {
             return Promise.reject(e);
         }
     }
+}
+
+export class MockBrowser implements IBrowser {
+    constructor(private fakeScreenshot: Buffer) {
+    }
+
+    $class(className: string): Promise<void> {
+        return Promise.resolve(undefined);
+    }
+
+    $texts(...linkText: string[]): Promise<void> {
+        return Promise.resolve(undefined);
+    }
+
+    close(): Promise<void> {
+        return Promise.resolve(undefined);
+    }
+
+    currentUrl(): URL {
+        return new URL("https://example.com");
+    }
+
+    goTo(url: URL): Promise<HTTPResponse | null> {
+        return Promise.resolve(null);
+    }
+
+    launch(url: URL): Promise<void> {
+        return Promise.resolve(undefined);
+    }
+
+    screenshot(full?: boolean): Promise<Buffer> {
+        return Promise.resolve(this.fakeScreenshot);
+    }
+
+    scrollTo(text: string): Promise<void> {
+        return Promise.resolve(undefined);
+    }
+
+    selectAll(selector: string): Promise<ElementHandle<Element>[]> {
+        return Promise.resolve([]);
+    }
+
+    selectTextWithTag(tag: string, ...text: string[]): Promise<ElementHandle | null> {
+        return Promise.resolve(null);
+    }
+
 }
